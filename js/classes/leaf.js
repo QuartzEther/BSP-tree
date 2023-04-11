@@ -1,6 +1,6 @@
 import {Rectangle} from './rectangle.js'
 
-class Leaf {
+export class Leaf {
     static MIN_LEAF_SIZE = 6;
 
     leftChild = null; // левый дочерний Leaf нашего листа
