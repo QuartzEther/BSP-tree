@@ -1,13 +1,19 @@
 import {Leaf} from './classes/leaf.js'
 
-const MAX_LEAF_SIZE = 20;
+const MAX_LEAF_SIZE = 200;
+
+let parent = document.querySelector('.root');//родитель
+const parentHeight = parseInt(getComputedStyle(parent).height.split('px')[0]);
+const parentWidth = parseInt(getComputedStyle(parent).width.split('px')[0]);
+
+let margin = 4;//отступы элементов
 
 let _leafs = [];
 
 let l = new Leaf() //вспомогательный лист
 
 // сначала создаём лист, который будет "корнем" для всех остальных листьев.
-let root = new Leaf(0,0, 1100, 800);
+let root = new Leaf(0,0, parentWidth - margin, parentHeight - margin);
 _leafs.push(root);
 
 let didSplit = true;
@@ -32,9 +38,19 @@ while (didSplit){
 }
 
 
-
-let count = 0
+//отображение областей на root
 for (l of _leafs){
-    console.log(`leaf ${count}. x: ${l.x} y: ${l.y}. width: ${l.width} height: ${l.height}`);
-    count ++;
+    if(!l.leftChild && !l.rightChild){
+        let box = document.createElement('div');
+
+        box.classList.add('root__leaf');
+
+        box.style.width = l.width - margin + 'px';
+        box.style.height = l.height - margin + 'px';
+
+        box.style.top = l.y + margin + 'px'
+        box.style.left = l.x + margin + 'px'
+
+        parent.appendChild(box);
+    }
 }
