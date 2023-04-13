@@ -92,7 +92,7 @@ export class Rectangle {
         return new Rectangle(this.x, this.y, this.width, this.height);
     }
 
-    toString() {
+    string() {
         return `[Rectangle(x=${this.x}, y=${this.y}, width=${this.width}, height=${this.height})]`;
     }
 }

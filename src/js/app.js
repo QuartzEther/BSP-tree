@@ -1,3 +1,4 @@
+import {Rectangle} from './classes/rectangle.js'
 import {Leaf} from './classes/leaf.js'
 
 const MAX_LEAF_SIZE = 600;  // начальное 200
@@ -11,6 +12,7 @@ let margin = 4;//отступы элементов
 let _leafs = [];
 
 let l = new Leaf() //вспомогательный лист
+let h = new Rectangle() //вспомогательный лист
 
 // сначала создаём лист, который будет "корнем" для всех остальных листьев.
 let root = new Leaf(0,0, parentWidth - margin, parentHeight - margin);
@@ -68,6 +70,24 @@ for (l of _leafs){
         newRoom.style.top = l.room.y + 'px'
         newRoom.style.left = l.room.x + 'px'
 
-        newLeaf.appendChild(newRoom);
+        parent.appendChild(newRoom);
+    }
+
+    if (l.halls.length){
+        for (h of l.halls){
+            let newHall = document.createElement('div');
+
+            newHall.classList.add('root__hall');
+
+            newHall.style.width = h.width + 'px';
+            newHall.style.height = h.height + 'px';
+
+            newHall.style.top = h.y + 'px'
+            newHall.style.left = h.x + 'px'
+
+            newHall.style.zIndex = 1;
+
+            parent.appendChild(newHall);
+        }
     }
 }

@@ -11,7 +11,7 @@ export class Leaf {
 
     leftChild = null; // левый дочерний Leaf нашего листа
     rightChild = null; // правый дочерний Leaf нашего листа
-    room = new Rectangle() // комната, находящаяся внутри листа
+    room = null// комната, находящаяся внутри листа
     halls = []; // коридоры, соединяющие этот лист с другими листьями
 
     // положение и размер этого листа
@@ -62,9 +62,15 @@ export class Leaf {
         // эта функция генерирует все комнаты и коридоры для этого листа и всех его дочерних листьев.
         if (this.leftChild || this.rightChild){
             // этот лист был разрезан, поэтому переходим к его дочерним листьям
-            if(this.leftChild) this.leftChild.createRooms()
+            if (this.leftChild){
+                this.leftChild.createRooms()
 
-            if(this.rightChild) this.rightChild.createRooms()
+            }
+
+            if (this.rightChild){
+                this.rightChild.createRooms()
+
+            }
 
             // если у этого листа есть и левый, и правый дочерние листья, то создаём между ними коридор
             if (this.leftChild && this.rightChild)
@@ -93,10 +99,10 @@ export class Leaf {
             roomPos = new Point(randomNumber(minLeftTop, maxLeft), randomNumber(minLeftTop, maxTop));
 
             //создаем комнату
-            this.room = new Rectangle(roomPos.x, roomPos.y, roomSize.x, roomSize.y);
+            //this.room = new Rectangle(roomPos.x, roomPos.y, roomSize.x, roomSize.y);
 
             //для абсолютного позиционирования room от root
-            //this.room = new Rectangle(this.x + roomPos.x, this.y + roomPos.y, roomSize.x, roomSize.y);
+            this.room = new Rectangle(this.x + roomPos.x, this.y + roomPos.y, roomSize.x, roomSize.y);
         }
     }
 
@@ -142,8 +148,9 @@ export class Leaf {
         // При желании можно добавить логику, делающую коридоры более извилистыми, или реализующую другое сложное поведение.
 
         //this.halls = [];
-        let point1 = new Point(randomNumber(l.left + 1, l.right - 2), randomNumber(l.top + 1, l.bottom - 2));
-        let point2 = new Point(randomNumber(r.left + 1, r.right - 2), randomNumber(r.top + 1, r.bottom - 2));
+
+        let point1 = new Point(randomNumber(l.left + 10, l.right - 20), randomNumber(l.top + 10, l.bottom - 20));
+        let point2 = new Point(randomNumber(r.left + 10, r.right - 20), randomNumber(r.top + 10, r.bottom - 20));
 
         let w = point2.x - point1.x;
         let h = point2.y - point1.y;
