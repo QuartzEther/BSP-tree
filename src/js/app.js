@@ -69,6 +69,5 @@ for (l of _leafs){
         newRoom.style.left = l.room.x + 'px'
 
         newLeaf.appendChild(newRoom);
-
     }
 }

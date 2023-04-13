@@ -1,6 +1,11 @@
 import {Rectangle} from './rectangle.js'
 import {Point} from './point.js'
 
+function randomNumber(from = 0, to = 100){
+    //Registry.randomNumber(a, b) == Math.floor(Math.random() * (b - a + 1) + a)
+    return Math.floor(Math.random() * (to - from + 1) + from);
+}
+
 export class Leaf {
     static MIN_LEAF_SIZE = 200; // начальное 60
 
@@ -16,8 +21,6 @@ export class Leaf {
         this.width = width;
         this.height = height;
     }
-
-
 
     split() {
         // начинаем разрезать лист на два дочерних листа
@@ -41,7 +44,7 @@ export class Leaf {
             return false; // область слишком мала, больше её делить нельзя...
         }
 
-        const split = Math.floor(Math.random() * (max - Leaf.MIN_LEAF_SIZE + 1) + Leaf.MIN_LEAF_SIZE);// определяемся, где будем разрезать
+        const split = randomNumber(Leaf.MIN_LEAF_SIZE, max)// определяемся, где будем разрезать
 
         // создаём левый и правый дочерние листы на основании направления разрезания
         if (splitH) {
@@ -60,20 +63,26 @@ export class Leaf {
         if (this.leftChild || this.rightChild){
             // этот лист был разрезан, поэтому переходим к его дочерним листьям
             if(this.leftChild) this.leftChild.createRooms()
+
             if(this.rightChild) this.rightChild.createRooms()
+
+            // если у этого листа есть и левый, и правый дочерние листья, то создаём между ними коридор
+            if (this.leftChild && this.rightChild)
+            {
+                this.createHall(this.leftChild.getRoom(), this.rightChild.getRoom());
+            }
 
         } else {
             // этот лист готов к созданию комнаты
             let roomSize = null;
             let roomPos = null;
 
-            //Registry.randomNumber(a, b) == Math.floor(Math.random() * (b - a + 1) + a)
             // размер комнаты может находиться в промежутке от 30px x 30px до размера листа - 5px.
             let min = 100; // начальное 30
             let tempWidth = this.width - 20 // начальное 10
             let tempHeight = this.height - 20 // начальное 10
 
-            roomSize = new Point(Math.floor(Math.random() * (tempWidth - min + 1) + min), Math.floor(Math.random() * (tempHeight - min + 1) + min));
+            roomSize = new Point(randomNumber(min, tempWidth), randomNumber(min, tempHeight));
 
             // располагаем комнату внутри листа, но не помещаем её прямо
             // рядом со стороной листа (иначе комнаты сольются)
@@ -81,13 +90,114 @@ export class Leaf {
             let maxLeft = this.width - roomSize.x - 5;
             let maxTop = this.height - roomSize.y - 5;
 
-            roomPos = new Point(Math.floor(Math.random() * (maxLeft - minLeftTop + 1) + minLeftTop), Math.floor(Math.random() * (maxTop - minLeftTop + 1) + minLeftTop));
+            roomPos = new Point(randomNumber(minLeftTop, maxLeft), randomNumber(minLeftTop, maxTop));
 
             //создаем комнату
             this.room = new Rectangle(roomPos.x, roomPos.y, roomSize.x, roomSize.y);
 
             //для абсолютного позиционирования room от root
             //this.room = new Rectangle(this.x + roomPos.x, this.y + roomPos.y, roomSize.x, roomSize.y);
+        }
+    }
+
+    //Поиск какой-то комнаты
+    getRoom(){
+        // итеративно проходим весь путь по этим листьям, чтобы найти комнату, если она существует.
+        if (this.room)
+            return this.room;
+        else
+        {
+            let lRoom = null;
+            let rRoom = null;
+
+            if (this.leftChild)
+            {
+                lRoom = this.leftChild.getRoom();
+            }
+
+            if (this.rightChild)
+            {
+                rRoom = this.rightChild.getRoom();
+            }
+
+            if (lRoom == null && rRoom == null){
+                return null;
+            } else if (rRoom == null){
+                return lRoom;
+            } else if (lRoom == null){
+                return rRoom;
+            } else if (Math.random() > 0.5){
+                return lRoom;
+            } else {
+                return rRoom;
+            }
+        }
+    }
+
+    //создание коридора между 2-мя комнатами
+    createHall(l, r){
+        // Теперь мы соединяем эти две комнаты коридорами.
+        // Выглядит довольно сложно, но здесь мы просто выясняем, где какая точка находится, а затем отрисовываем прямую линию или пару линий,
+        // чтобы создать правильный угол для их соединения.
+        // При желании можно добавить логику, делающую коридоры более извилистыми, или реализующую другое сложное поведение.
+
+        //this.halls = [];
+        let point1 = new Point(randomNumber(l.left + 1, l.right - 2), randomNumber(l.top + 1, l.bottom - 2));
+        let point2 = new Point(randomNumber(r.left + 1, r.right - 2), randomNumber(r.top + 1, r.bottom - 2));
+
+        let w = point2.x - point1.x;
+        let h = point2.y - point1.y;
+
+        let autoWH = 10;
+
+        if (w < 0)
+        {
+            if (h < 0)
+            {
+                if (Math.random() < 0.5) {
+                    this.halls.push(new Rectangle(point2.x, point1.y, Math.abs(w), autoWH));
+                    this.halls.push(new Rectangle(point2.x, point2.y, autoWH, Math.abs(h)));
+                } else {
+                    this.halls.push(new Rectangle(point2.x, point2.y, Math.abs(w), autoWH));
+                    this.halls.push(new Rectangle(point1.x, point2.y, autoWH, Math.abs(h)));
+                }
+            } else if (h > 0) {
+                if (Math.random() < 0.5) {
+                    this.halls.push(new Rectangle(point2.x, point1.y, Math.abs(w), autoWH));
+                    this.halls.push(new Rectangle(point2.x, point1.y, autoWH, Math.abs(h)));
+                } else {
+                    this.halls.push(new Rectangle(point2.x, point2.y, Math.abs(w), autoWH));
+                    this.halls.push(new Rectangle(point1.x, point1.y, autoWH, Math.abs(h)));
+                }
+            } else {
+                this.halls.push(new Rectangle(point2.x, point2.y, Math.abs(w), autoWH));
+            }
+        } else if (w > 0) {
+            if (h < 0) {
+                if (Math.random() < 0.5) {
+                    this.halls.push(new Rectangle(point1.x, point2.y, Math.abs(w), autoWH));
+                    this.halls.push(new Rectangle(point1.x, point2.y, autoWH, Math.abs(h)));
+                } else {
+                    this.halls.push(new Rectangle(point1.x, point1.y, Math.abs(w), autoWH));
+                    this.halls.push(new Rectangle(point2.x, point2.y, autoWH, Math.abs(h)));
+                }
+            } else if (h > 0) {
+                if (Math.random() < 0.5) {
+                    this.halls.push(new Rectangle(point1.x, point1.y, Math.abs(w), autoWH));
+                    this.halls.push(new Rectangle(point2.x, point1.y, autoWH, Math.abs(h)));
+                } else {
+                    this.halls.push(new Rectangle(point1.x, point2.y, Math.abs(w), autoWH));
+                    this.halls.push(new Rectangle(point1.x, point1.y, autoWH, Math.abs(h)));
+                }
+            } else {
+                this.halls.push(new Rectangle(point1.x, point1.y, Math.abs(w), autoWH));
+            }
+        } else {
+            if (h < 0) {
+                this.halls.push(new Rectangle(point2.x, point2.y, autoWH, Math.abs(h)));
+            } else if (h > 0) {
+                this.halls.push(new Rectangle(point1.x, point1.y, autoWH, Math.abs(h)));
+            }
         }
     }
 }
