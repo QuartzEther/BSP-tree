@@ -73,6 +73,7 @@ for (l of _leafs){
         parent.appendChild(newRoom);
     }
 
+    //---------------halls--------------
     if (l.halls.length){
         for (h of l.halls){
             let newHall = document.createElement('div');
