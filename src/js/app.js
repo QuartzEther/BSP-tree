@@ -1,6 +1,6 @@
 import {Leaf} from './classes/leaf.js'
 
-const MAX_LEAF_SIZE = 200;
+const MAX_LEAF_SIZE = 600;  // начальное 200
 
 let parent = document.querySelector('.root');//родитель
 const parentHeight = parseInt(getComputedStyle(parent).height.split('px')[0]);
@@ -37,20 +37,38 @@ while (didSplit){
     }
 }
 
+// затем итеративно проходим по каждому листу и создаём в каждом комнату.
+root.createRooms();
 
 //отображение областей на root
 for (l of _leafs){
     if(!l.leftChild && !l.rightChild){
-        let box = document.createElement('div');
 
-        box.classList.add('root__leaf');
+        //---------------leaf--------------
+        let newLeaf = document.createElement('div');
 
-        box.style.width = l.width - margin + 'px';
-        box.style.height = l.height - margin + 'px';
+        newLeaf.classList.add('root__leaf');
 
-        box.style.top = l.y + margin + 'px'
-        box.style.left = l.x + margin + 'px'
+        newLeaf.style.width = l.width - margin + 'px';
+        newLeaf.style.height = l.height - margin + 'px';
 
-        parent.appendChild(box);
+        newLeaf.style.top = l.y + margin + 'px'
+        newLeaf.style.left = l.x + margin + 'px'
+
+        parent.appendChild(newLeaf);
+
+        //---------------room--------------
+        let newRoom = document.createElement('div');
+
+        newRoom.classList.add('root__leaf__room');
+
+        newRoom.style.width = l.room.width + 'px';
+        newRoom.style.height = l.room.height + 'px';
+
+        newRoom.style.top = l.room.y + 'px'
+        newRoom.style.left = l.room.x + 'px'
+
+        newLeaf.appendChild(newRoom);
+
     }
 }

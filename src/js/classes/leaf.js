@@ -2,7 +2,7 @@ import {Rectangle} from './rectangle.js'
 import {Point} from './point.js'
 
 export class Leaf {
-    static MIN_LEAF_SIZE = 60;
+    static MIN_LEAF_SIZE = 200; // начальное 60
 
     leftChild = null; // левый дочерний Leaf нашего листа
     rightChild = null; // правый дочерний Leaf нашего листа
@@ -16,6 +16,8 @@ export class Leaf {
         this.width = width;
         this.height = height;
     }
+
+
 
     split() {
         // начинаем разрезать лист на два дочерних листа
@@ -66,23 +68,26 @@ export class Leaf {
             let roomPos = null;
 
             //Registry.randomNumber(a, b) == Math.floor(Math.random() * (b - a + 1) + a)
-            // размер комнаты может находиться в промежутке от 3 x 3 тайла до размера листа - 2.
-            let min = 3;
-            let tempWidth = this.width - 2
-            let tempHeight = this.height - 2
+            // размер комнаты может находиться в промежутке от 30px x 30px до размера листа - 5px.
+            let min = 100; // начальное 30
+            let tempWidth = this.width - 20 // начальное 10
+            let tempHeight = this.height - 20 // начальное 10
 
             roomSize = new Point(Math.floor(Math.random() * (tempWidth - min + 1) + min), Math.floor(Math.random() * (tempHeight - min + 1) + min));
 
             // располагаем комнату внутри листа, но не помещаем её прямо
             // рядом со стороной листа (иначе комнаты сольются)
-            let temp = 1;
-            let tempX = this.width - roomSize.x - 1;
-            let tempY = this.height - roomSize.y - 1;
+            let minLeftTop = 5;
+            let maxLeft = this.width - roomSize.x - 5;
+            let maxTop = this.height - roomSize.y - 5;
 
-            roomPos = new Point(Math.floor(Math.random() * (tempX - temp + 1) + temp), Math.floor(Math.random() * (tempY - temp + 1) + temp));
+            roomPos = new Point(Math.floor(Math.random() * (maxLeft - minLeftTop + 1) + minLeftTop), Math.floor(Math.random() * (maxTop - minLeftTop + 1) + minLeftTop));
 
             //создаем комнату
-            this.room = new Rectangle(this.x + roomPos.x, this.y + roomPos.y, roomSize.x, roomSize.y);
+            this.room = new Rectangle(roomPos.x, roomPos.y, roomSize.x, roomSize.y);
+
+            //для абсолютного позиционирования room от root
+            //this.room = new Rectangle(this.x + roomPos.x, this.y + roomPos.y, roomSize.x, roomSize.y);
         }
     }
 }
